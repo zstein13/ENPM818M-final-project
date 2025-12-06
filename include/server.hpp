@@ -56,6 +56,9 @@ void handle_about(std::string method, int client_sock);
  */
 void handle_not_found(std::string method, int client_sock);
 
+
+void handle_email(std::string method, int client_sock);
+
 /**
  * @brief 
  * 

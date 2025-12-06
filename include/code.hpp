@@ -9,4 +9,10 @@ enum class Code {
     INTERNAL_ERROR=500
 };
 
+/**
+ * @brief Get the status msg object
+ * 
+ * @param code 
+ * @return std::string 
+ */
 std::string get_status_msg(Code code);
