@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "response.hpp"
+
 #pragma once
 
 #define SERVER_PORT 8081
@@ -19,7 +21,7 @@
  * @param client_sock 
  * @param response 
  */
-void send_response(int client_sock, const char *response);
+void send_response(int client_sock, Response response);
 
 /**
  * @brief 
@@ -27,6 +29,32 @@ void send_response(int client_sock, const char *response);
  * @param client_sock 
  */
 void handle_request(int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param endpoint 
+ * @param client_sock 
+ */
+void handle_home(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param endpoint 
+ * @param client_sock 
+ */
+void handle_about(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
+void handle_not_found(std::string method, int client_sock);
 
 /**
  * @brief 

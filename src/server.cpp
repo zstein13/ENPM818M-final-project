@@ -1,74 +1,73 @@
 #include <string>
+#include <sstream>
 
 #include "server.hpp"
 #include "response.hpp"
 #include "code.hpp"
 #include "header.hpp"
 
-void send_response(int client_sock, std::string response)
+void send_response(int client_sock, Response response)
 {
-    write(client_sock, response.c_str(), response.length());
+    Header head{response};
+
+    std::string server_response{static_cast<std::string>(head) + static_cast<std::string>(response)};
+    // Send welcome message
+    write(client_sock, server_response.c_str(), server_response.length());
+
+    close(client_sock);
 }
 
 void handle_request(int client_sock)
 {
     char buffer[BUFFER_SIZE];
-    std::string buffer_str;
-    buffer_str.reserve(BUFFER_SIZE);
-    buffer_str = buffer;
+    // Read from socket
+    ssize_t bytes_read = read(client_sock, buffer, sizeof(buffer));
 
-    // Create repsonse object
-    Response res{Code::OK, "GET", "Hi Abby!"};
-    Header head{res};
+    if (bytes_read < 0)
+    {
+        perror("Read failed");
+        return;
+    }
 
-    std::string server_response{static_cast<std::string>(head) + static_cast<std::string>(res)};
-    // Send welcome message
-    send_response(client_sock, server_response);
+    std::string buffer_str(buffer, bytes_read);
+    std::cout << buffer_str << '\n';
 
-    close(client_sock);
+    std::stringstream request_stream{buffer_str};
+    std::string method;
+    std::string endpoint;
+
+    request_stream >> method >> endpoint;
+
+    if (endpoint == "/") {
+        handle_home(method, client_sock);
+    } else if (endpoint == "/about") {
+        handle_about(method, client_sock);
+    } else {
+        handle_not_found(method, client_sock);
+    }
+
 }
 
-void server() {
-    int server_sock, client_sock;
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
+void handle_home(std::string method, int client_sock) {
+    // Create repsonse object
+    Response res{Code::OK, method, "Welcome to the basic HTTP Server!"};
+    
+    // Send welcome message
+    send_response(client_sock, res);
 
-    // Create socket
-    if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        perror("Socket creation error");
-        exit(1);
-    }
+}
 
-    // Bind address and port to socket
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(SERVER_PORT);
+void handle_about(std::string method, int client_sock) {
+    // Create repsonse object
+    Response res{Code::OK, method, "This HTTP server is a final project for ENPM818M."};
 
-    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-    {
-        perror("Bind failed");
-        close(server_sock);
-        exit(1);
-    }
+    send_response(client_sock, res);
+}
 
-    // Start listening for connections
-    if (listen(server_sock, 5) < 0)
-    {
-        perror("Listen failed");
-        close(server_sock);
-        exit(1);
-    }
+void handle_not_found(std::string method, int client_sock)
+{
+    // Create repsonse object
+    Response res{Code::NOT_FOUND, method, "Error! Endpoint not found..."};
 
-    printf("HTTP server started on port %d\n", SERVER_PORT);
-
-    // Accept client connections and handle them
-    while ((client_sock = accept(server_sock, (struct sockaddr *)&client_addr, &client_addr_len)) > 0)
-    {
-        printf("Client connected\n");
-        handle_request(client_sock);
-    }
-
-    // Close server socket
-    close(server_sock);
+    send_response(client_sock, res);
 }
