@@ -1,9 +1,12 @@
 #include <string>
 #include <sstream>
+#include "code.hpp"
+
+#pragma once
 
 struct Response
 {
-    int status;
+    Code status;
     std::string request_type;
     std::string data;
 
@@ -11,7 +14,7 @@ struct Response
         std::stringstream stream;
         stream << "{";
         // Status
-        stream << "\"status\": \"" << std::to_string(status) << "\",";
+        stream << "\"status\": \"" << static_cast<int>(status) << "\",";
         // request_type
         stream << "\"request_type\": \"" << request_type << "\",";
         // data

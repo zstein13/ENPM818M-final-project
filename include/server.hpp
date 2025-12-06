@@ -8,7 +8,9 @@
 #include <iostream>
 #include <sstream>
 
-#define SERVER_PORT 21
+#pragma once
+
+#define SERVER_PORT 8081
 #define BUFFER_SIZE 1024
 
 /**

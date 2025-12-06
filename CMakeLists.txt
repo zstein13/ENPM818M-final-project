@@ -9,6 +9,7 @@ project(http_server VERSION 1.0 LANGUAGES C CXX)
 add_executable(http_server
  src/main.cpp
  src/server.cpp
+ src/code.cpp
 )
 target_include_directories(http_server PRIVATE include)
 

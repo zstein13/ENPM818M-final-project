@@ -1,8 +1,13 @@
-#include "server.hpp"
+#include <string>
 
-void send_response(int client_sock, const char *response)
+#include "server.hpp"
+#include "response.hpp"
+#include "code.hpp"
+#include "header.hpp"
+
+void send_response(int client_sock, std::string response)
 {
-    write(client_sock, response, strlen(response));
+    write(client_sock, response.c_str(), response.length());
 }
 
 void handle_request(int client_sock)
@@ -12,8 +17,13 @@ void handle_request(int client_sock)
     buffer_str.reserve(BUFFER_SIZE);
     buffer_str = buffer;
 
+    // Create repsonse object
+    Response res{Code::OK, "GET", "Hi Abby!"};
+    Header head{res};
+
+    std::string server_response{static_cast<std::string>(head) + static_cast<std::string>(res)};
     // Send welcome message
-    send_response(client_sock, "Welcome to the simple HTTP server\r\n");
+    send_response(client_sock, server_response);
 
     close(client_sock);
 }
