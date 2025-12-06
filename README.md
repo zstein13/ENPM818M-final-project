@@ -14,3 +14,8 @@ The HTTP Server will be built using C++
 - [ ] HTTP Server can handle different headers sent in the HTTP Client request.
 - [ ] HTTP Server implements error handling (can send 400, 404, and 500 error responses)
 
+## Endpoints
+
+- GET /
+- GET /about
+- GET /email/\<email\>

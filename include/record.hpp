@@ -10,7 +10,7 @@ struct Record
     operator std::string() const {
         std::stringstream stream;
 
-        stream << email << ", " << name << ", " << course;
+        stream << email << "," << name << "," << course;
 
         return stream.str();
     }
