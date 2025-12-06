@@ -3,7 +3,6 @@
 
 struct Response
 {
-public:
     int status;
     std::string request_type;
     std::string data;
