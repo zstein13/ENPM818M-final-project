@@ -120,9 +120,9 @@ void handle_request(int client_sock)
             handle_post_student(method, content_type, update_student, client_sock);
         }
         // Add PUT
-        // else if (method == "PUT") {
-            // handle_put_student(method, client_sock);
-        // }
+        else if (method == "PUT") {
+            handle_put_student(method, content_type, update_student, client_sock);
+        }
         else
         {
             handle_not_allowed(method, client_sock);
@@ -251,19 +251,32 @@ void handle_get_student(std::string method, std::string email, int client_sock)
 
 void handle_delete_student(std::string method, std::string email, int client_sock)
 {
+    Code code;
+    Response res;
     std::vector<Student> students{read_file()};
 
     // Find student using lambda function
     auto it = find_student(students, email);
-    students.erase(it);
 
-    update_file(students);
-
-    std::stringstream res_string;
-
-    res_string << "\"" << email << " was deleted from the database... \"";
-
-    Response res = {Code::OK, method, res_string.str()};
+    if (it != students.end()) {
+        
+        students.erase(it);
+        
+        code = update_file(students);
+        
+        std::string res_string;
+        
+        if (code == Code::OK) {
+            res_string = "\"" + email + " was deleted from the database...\"";
+        } 
+        else {
+            res_string = "\"Could not delete " + email + " from the database... \"";
+        }
+        res = {code, method, res_string};
+    } 
+    else {
+        res = {Code::BAD_REQUEST, method, "Bad Request! Student doesn't exist in DB"};
+    }
     send_response(client_sock, res);
 }
 
@@ -295,6 +308,37 @@ void handle_post_student(std::string method, std::string content_type, Student s
         handle_not_implemented(method, client_sock);
     }
 
+}
+
+void handle_put_student(std::string method, std::string content_type, Student student, int client_sock) {
+    Response res;
+    Code code;
+    if (content_type.substr(0, 33) == supported_content_type) {
+        // Get list of students from read_file()
+        std::vector<Student> students{read_file()};
+
+        // Check to see if student is in students
+        auto it = find_student(students, student.email);
+
+        if (it == students.end())
+        {
+            // Student does not exist in file
+            res = {Code::BAD_REQUEST, method, "Bad Request! Student does not exist in DB"};
+        }
+        else
+        {
+            // Modify it object with student fields update_file()
+            it->name = student.name;
+            it->course = student.course;
+
+            code = update_file(students);
+            res = {code, method, student.to_json()};
+        }
+        send_response(client_sock, res);
+    }
+    else {
+        handle_not_implemented(method, client_sock);
+    }
 }
 
 void server()

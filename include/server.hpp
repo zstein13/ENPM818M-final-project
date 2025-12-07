@@ -126,7 +126,7 @@ void handle_post_student(std::string method, std::string content_type, Student s
  * @param data 
  * @param client_sock 
  */
-void handle_put_student(std::string method, std::string content_type, std::string data, int client_sock);
+void handle_put_student(std::string method, std::string content_type, Student student, int client_sock);
 
 /**
  * @brief 
