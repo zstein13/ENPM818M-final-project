@@ -6,8 +6,8 @@
 #include "response.hpp"
 #include "code.hpp"
 #include "header.hpp"
-#include "student.hpp"
 #include "file.hpp"
+#include "student.hpp"
 
 void send_response(int client_sock, Response response)
 {
@@ -49,7 +49,18 @@ void handle_request(int client_sock)
         handle_get_all(method, client_sock);
     } else if (endpoint.find("/student/") != std::string::npos) {
         std::string email{endpoint.substr(9)};
-        handle_get_student(method, email, client_sock);
+        if (method == "GET") {
+            handle_get_student(method, email, client_sock);
+        }
+        else if (method == "POST") {
+            handle_post_student(method, client_sock);
+        }
+        else if (method == "DELETE") {
+            handle_delete_student(method, email, client_sock);
+        } 
+        else {
+            handle_not_allowed(method, client_sock);
+        }
     }
     else {
         handle_not_found(method, client_sock);
@@ -59,45 +70,47 @@ void handle_request(int client_sock)
 
 void handle_home(std::string method, int client_sock) {
     // Create repsonse object
-    Response res;
     if (method != "GET")
     {
-        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+        handle_not_allowed(method, client_sock);
     } else {
-        res = {Code::OK, method, "\"Welcome to the basic HTTP Server!\""};
+        Response res = {Code::OK, method, "\"Welcome to the basic HTTP Server!\""};
+        // Send welcome message
+        send_response(client_sock, res);
     }
     
-    // Send welcome message
-    send_response(client_sock, res);
 
 }
 
 void handle_about(std::string method, int client_sock) {
     // Create repsonse object
-    Response res;
     if (method != "GET")
     {
-        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+        handle_not_allowed(method, client_sock);
     } else {
-        res = {Code::OK, method, "\"This HTTP server is a final project for ENPM818M.\""};
+        Response res = {Code::OK, method, "\"This HTTP server is a final project for ENPM818M.\""};
+        send_response(client_sock, res);
     }
 
-    send_response(client_sock, res);
 }
 
 void handle_not_found(std::string method, int client_sock)
 {
     // Create repsonse object
     Response res{Code::NOT_FOUND, method, "\"Error! Endpoint not found...\""};
+    send_response(client_sock, res);
+}
 
+void handle_not_allowed(std::string method, int client_sock)
+{
+    // Create repsonse object
+    Response res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
     send_response(client_sock, res);
 }
 
 void handle_get_all(std::string method, int client_sock) {
-    Response res;
-    
     if (method != "GET") {
-        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+        handle_not_allowed(method, client_sock);
     } else {   
         std::vector<Student> students{read_file()};
         
@@ -118,35 +131,48 @@ void handle_get_all(std::string method, int client_sock) {
         
         stream << "]";
         
-        res = {Code::OK, method, stream.str()};
+        Response res = {Code::OK, method, stream.str()};
+        send_response(client_sock, res);
     }
 
-    send_response(client_sock, res);
 }
 
 void handle_get_student(std::string method, std::string email, int client_sock)
 {
-    // Create repsonse object
+    std::vector<Student> students{read_file()};
+    
+    // Create Lambda function to find student based off of email
+    auto it = find_student(students, email);
+
     Response res;
-    if (method != "GET")
-    {
-        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+    if (it != students.end()) {
+        // Found student
+        res = {Code::OK, method, it->to_json()};
+    } else {
+        res = {Code::BAD_REQUEST, method, "\"400 Bad Request...\""};
     }
-    else
-    {
-        std::vector<Student> students{read_file()};
-        
-        // Create Lambda function to find student based off of email
-        auto it{std::find_if(students.begin(), students.end(), [email] (Student student) { return student.email == email; })};
+    send_response(client_sock, res);
+}
 
-        if (it != students.end()) {
-            // Found student
-            res = {Code::OK, method, it->to_json()};
-        } else {
-            res = {Code::BAD_REQUEST, method, "\"400 Bad Request...\""};
-        }
-    }
+void handle_delete_student(std::string method, std::string email, int client_sock) {
+    std::vector<Student> students{read_file()};
+    
+    // Find student using lambda function
+    auto it = find_student(students, email);
+    students.erase(it);
 
+    update_file(students);
+
+    std::stringstream res_string;
+
+    res_string << "\"" << email << " was delete from the database... \"";
+
+    Response res = {Code::OK, method, res_string.str()};
+    send_response(client_sock, res);
+}
+
+void handle_post_student(std::string method, int client_sock){
+    Response res = {Code::OK, method, "Handling POST request"};
     send_response(client_sock, res);
 }
 
@@ -188,7 +214,23 @@ void server() {
     while ((client_sock = accept(server_sock, (struct sockaddr *)&client_addr, &client_addr_len)) > 0)
     {
         printf("Client connected\n");
-        handle_request(client_sock);
+
+        // Add fork logic to handle multiple connections
+        pid_t pid = fork();
+
+        if (pid < 0) {
+            perror("Fork failed");
+            close(client_sock);
+            continue;
+        }
+
+        if (pid == 0) {
+            close(server_sock);
+            handle_request(client_sock);
+            exit(0);
+        } else {
+            close(client_sock);
+        }
     }
 
     // Close server socket

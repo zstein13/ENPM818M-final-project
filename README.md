@@ -10,7 +10,7 @@ The HTTP Server will be built using C++
 - [x] HTTP Server can handle GET requests and return server information.
 - [ ] HTTP Server can handle POST requests by updating  a “database” file on the server side.
 - [ ] HTTP Server can handle PUT requests by updating  a “database” file on the server side.
-- [ ] HTTP Server can handle DELETE requests by updating  a “database” file on the server side.
+- [x] HTTP Server can handle DELETE requests by updating  a “database” file on the server side.
 - [ ] HTTP Server can handle different headers sent in the HTTP Client request.
 - [x] HTTP Server implements error handling: 400 Error
 - [x] HTTP Server implements error handling: 404 Error

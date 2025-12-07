@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "response.hpp"
+#include "student.hpp"
 
 #pragma once
 
@@ -62,6 +63,14 @@ void handle_not_found(std::string method, int client_sock);
  * @param method 
  * @param client_sock 
  */
+void handle_not_allowed(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
 void handle_get_all(std::string method, int client_sock);
 
 /**
@@ -72,6 +81,17 @@ void handle_get_all(std::string method, int client_sock);
  * @param client_sock 
  */
 void handle_get_student(std::string method, std::string email, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param email 
+ * @param client_sock 
+ */
+void handle_delete_student(std::string method, std::string email, int client_sock);
+
+void handle_post_student(std::string method, int client_sock);
 
 /**
  * @brief 

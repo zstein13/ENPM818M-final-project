@@ -1,4 +1,10 @@
 email,name,course
 alice@example.com,Alice Smith,ENPM818M
-bob@example.com,Bob Jones,ENPM702
-zstein13@umd.edu,Zach,ENPM818M
+bob@example.com,Bob Jones,ENPM818J
+david@example.com,David Wilson,ENPM615
+eve@example.com,Eve Davis,ENPM818M
+frank@example.com,Frank Miller,ENPM818J
+grace@example.com,Grace Lee,ENPM818I
+heidi@example.com,Heidi Klum,ENPM615
+ivan@example.com,Ivan Drago,ENPM818M
+judy@example.com,Judy Garland,ENPM818J
