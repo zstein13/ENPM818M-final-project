@@ -16,11 +16,11 @@ struct Response
         // Status
         stream << "\"status\": \"" << static_cast<int>(status) << "\",";
         // request_type
-        stream << "\"request_type\": \"" << request_type << "\",";
+        stream << "\"request_method\": \"" << request_type << "\",";
         // data
-        stream << "\"data\": \"" << data << "\"";
+        stream << "\"data\": " << data;
         stream << "}";
 
         return stream.str();
     }
-}; 
+};

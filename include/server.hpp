@@ -9,11 +9,21 @@
 #include <sstream>
 
 #include "response.hpp"
+#include "student.hpp"
 
 #pragma once
 
-#define SERVER_PORT 8081
-#define BUFFER_SIZE 1024
+const int server_port{8081};
+const int buffer_size{1024};
+const std::string supported_content_type{"application/x-www-form-urlencoded"};
+
+/**
+ * @brief 
+ * 
+ * @param data 
+ * @return Student 
+ */
+Student parse_data(std::string data);
 
 /**
  * @brief 
@@ -55,6 +65,68 @@ void handle_about(std::string method, int client_sock);
  * @param client_sock 
  */
 void handle_not_found(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
+void handle_not_allowed(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
+void handle_not_implemented(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
+void handle_get_all(std::string method, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param email 
+ * @param client_sock 
+ */
+void handle_get_student(std::string method, std::string email, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param email 
+ * @param client_sock 
+ */
+void handle_delete_student(std::string method, std::string email, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param content_type 
+ * @param data 
+ * @param client_sock 
+ */
+void handle_post_student(std::string method, std::string content_type, Student student, int client_sock);
+
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param content_type 
+ * @param data 
+ * @param client_sock 
+ */
+void handle_put_student(std::string method, std::string content_type, Student student, int client_sock);
 
 /**
  * @brief 
