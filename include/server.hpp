@@ -59,6 +59,13 @@ void handle_home(std::string method, int client_sock);
  */
 void handle_about(std::string method, int client_sock);
 
+/**
+ * @brief 
+ * 
+ * @param code 
+ * @param method 
+ * @param client_sock 
+ */
 void handle_error(Code code, std::string method, int client_sock);
 
 /**
