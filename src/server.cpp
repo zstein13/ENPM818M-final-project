@@ -72,6 +72,8 @@ void handle_request(int client_sock)
     std::string endpoint;
     // Content-Type header
     std::string content_type;
+    // User-Role header
+    std::string user_role;
     // POST/PUT data
     std::string data;
     // Student object to update db with
@@ -87,6 +89,15 @@ void handle_request(int client_sock)
         // Check for content type
         if (line.find("Content-Type:") == 0) {
             content_type = line.substr(14);
+        }
+        // Get user_role header value
+        if (line.find(user_header) == 0) {
+            user_role = line.substr(user_header.length() + 1);
+            // Remove \r and \n from user_role string
+            while (!user_role.empty() && (user_role.back() == '\r' || user_role.back() == '\n')) {
+                user_role.pop_back();
+            }
+            std::cout << "user role: " << user_role << '\n';
         }
         // Process data if content type is application/x-www-form-urlencoded
         if (content_type.substr(0,33) == supported_content_type) {
@@ -110,22 +121,33 @@ void handle_request(int client_sock)
     }
     else if (endpoint == "/students")
     {
-        handle_get_all(method, client_sock);
+        if (user_role == "Viewer" || user_role == "Admin"){
+            handle_get_all(method, client_sock);
+        }
+        else {
+            handle_error(Code::UNAUTHORIZED, method, client_sock);
+        }
     }
     else if (endpoint == "/student")
     {
-        if (method == "POST")
-        {
-            // Add content type and data
-            handle_post_student(method, content_type, update_student, client_sock);
-        }
-        // Add PUT
-        else if (method == "PUT") {
-            handle_put_student(method, content_type, update_student, client_sock);
-        }
-        else
-        {
-            handle_not_allowed(method, client_sock);
+        if (user_role == "Admin") {
+            if (method == "POST")
+            {
+                // Add content type and data
+                handle_post_student(method, content_type, update_student, client_sock);
+            }
+            // Add PUT
+            else if (method == "PUT")
+            {
+                handle_put_student(method, content_type, update_student, client_sock);
+            }
+            else
+            {
+                handle_error(Code::NOT_ALLOWED, method, client_sock);
+            }
+        } 
+        else {
+            handle_error(Code::UNAUTHORIZED, method, client_sock);
         }
     }
     else if (endpoint.find("/student/") != std::string::npos)
@@ -133,20 +155,30 @@ void handle_request(int client_sock)
         std::string email{endpoint.substr(9)};
         if (method == "GET")
         {
-            handle_get_student(method, email, client_sock);
+            if (user_role == "Viewer" || user_role == "Admin") {
+                handle_get_student(method, email, client_sock);
+            }
+            else {
+                handle_error(Code::UNAUTHORIZED, method, client_sock);
+            }
         }
         else if (method == "DELETE")
         {
-            handle_delete_student(method, email, client_sock);
+            if (user_role == "Admin"){
+                handle_delete_student(method, email, client_sock);
+            }
+            else {
+                handle_error(Code::UNAUTHORIZED, method, client_sock);
+            }
         }
         else
         {
-            handle_not_allowed(method, client_sock);
+            handle_error(Code::NOT_ALLOWED, method, client_sock);
         }
     }
     else
     {
-        handle_not_found(method, client_sock);
+        handle_error(Code::NOT_FOUND, method, client_sock);
     }
 }
 
@@ -155,7 +187,7 @@ void handle_home(std::string method, int client_sock)
     // Create repsonse object
     if (method != "GET")
     {
-        handle_not_allowed(method, client_sock);
+        handle_error(Code::NOT_ALLOWED, method, client_sock);
     }
     else
     {
@@ -170,7 +202,7 @@ void handle_about(std::string method, int client_sock)
     // Create repsonse object
     if (method != "GET")
     {
-        handle_not_allowed(method, client_sock);
+        handle_error(Code::NOT_ALLOWED, method, client_sock);
     }
     else
     {
@@ -179,22 +211,8 @@ void handle_about(std::string method, int client_sock)
     }
 }
 
-void handle_not_found(std::string method, int client_sock)
-{
-    // Create repsonse object
-    Response res{Code::NOT_FOUND, method, "\"Error! Endpoint not found...\""};
-    send_response(client_sock, res);
-}
-
-void handle_not_allowed(std::string method, int client_sock)
-{
-    // Create repsonse object
-    Response res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
-    send_response(client_sock, res);
-}
-
-void handle_not_implemented(std::string method, int client_sock) {
-    Response res = {Code::NOT_IMPLEMENTED, method, "\"501 Not Implemented. Server is unable to fulfill the request...\""};
+void handle_error(Code code, std::string method, int client_sock) {
+    Response res{code, method, get_status_msg(code)};
     send_response(client_sock, res);
 }
 
@@ -202,7 +220,7 @@ void handle_get_all(std::string method, int client_sock)
 {
     if (method != "GET")
     {
-        handle_not_allowed(method, client_sock);
+        handle_error(Code::NOT_ALLOWED, method, client_sock);
     }
     else
     {
@@ -305,7 +323,7 @@ void handle_post_student(std::string method, std::string content_type, Student s
         send_response(client_sock, res);
     }
     else {
-        handle_not_implemented(method, client_sock);
+        handle_error(Code::NOT_IMPLEMENTED, method, client_sock);
     }
 
 }
@@ -337,7 +355,7 @@ void handle_put_student(std::string method, std::string content_type, Student st
         send_response(client_sock, res);
     }
     else {
-        handle_not_implemented(method, client_sock);
+        handle_error(Code::NOT_IMPLEMENTED, method, client_sock);
     }
 }
 

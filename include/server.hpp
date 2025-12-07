@@ -16,6 +16,7 @@
 const int server_port{8081};
 const int buffer_size{1024};
 const std::string supported_content_type{"application/x-www-form-urlencoded"};
+const std::string user_header{"User-Role:"};
 
 /**
  * @brief 
@@ -58,29 +59,7 @@ void handle_home(std::string method, int client_sock);
  */
 void handle_about(std::string method, int client_sock);
 
-/**
- * @brief 
- * 
- * @param method 
- * @param client_sock 
- */
-void handle_not_found(std::string method, int client_sock);
-
-/**
- * @brief 
- * 
- * @param method 
- * @param client_sock 
- */
-void handle_not_allowed(std::string method, int client_sock);
-
-/**
- * @brief 
- * 
- * @param method 
- * @param client_sock 
- */
-void handle_not_implemented(std::string method, int client_sock);
+void handle_error(Code code, std::string method, int client_sock);
 
 /**
  * @brief 
