@@ -21,9 +21,14 @@ The HTTP Server will be built using C++
 - GET /
 - GET /about
 - GET /students
+    - Requires `User-Role: Viewer or Admin` header
 - GET /student/\<email\>
+    - Requires `User-Role: Viewer or Admin` header
 - DELETE /student/\<email\>
+    - Requires `User-Role: Admin` header
 - POST /student
+    - Requires `User-Role: Admin` header
     - Add email, name, and course as data fields
 - PUT /student
+    - Requires `User-Role: Admin` header
     - Add email, name, and course as data fields

@@ -5,22 +5,25 @@ std::string get_status_msg(Code code) {
     switch (code)
     {
     case Code::OK:
-        return "OK";    
+        return "\"OK\"";
+        break;
+    case Code::UNAUTHORIZED:
+        return "\"Unauthorized\"";
         break;
     case Code::BAD_REQUEST:
-        return "Bad Request";
+        return "\"Bad Request\"";
         break;
     case Code::NOT_FOUND:
-        return "Not Found";
+        return "\"Not Found\"";
         break;
     case Code::INTERNAL_ERROR:
-        return "Internal Error";
+        return "\"Internal Error\"";
         break;
     case Code::NOT_IMPLEMENTED:
-        return "Not Implemented";
+        return "\"Not Implemented\"";
         break;
     default:
-        return "Error";
+        return "\"Error\"";
         break;
     }
 }
