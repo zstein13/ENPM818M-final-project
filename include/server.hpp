@@ -56,8 +56,22 @@ void handle_about(std::string method, int client_sock);
  */
 void handle_not_found(std::string method, int client_sock);
 
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param client_sock 
+ */
+void handle_get_all(std::string method, int client_sock);
 
-void handle_email(std::string method, int client_sock);
+/**
+ * @brief 
+ * 
+ * @param method 
+ * @param email 
+ * @param client_sock 
+ */
+void handle_get_student(std::string method, std::string email, int client_sock);
 
 /**
  * @brief 

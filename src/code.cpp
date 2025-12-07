@@ -17,6 +17,7 @@ std::string get_status_msg(Code code) {
         return "Internal Server Error";
         break;
     default:
+        return "Error";
         break;
     }
 }

@@ -10,6 +10,7 @@ add_executable(http_server
  src/main.cpp
  src/server.cpp
  src/code.cpp
+ src/file.cpp
 )
 target_include_directories(http_server PRIVATE include)
 

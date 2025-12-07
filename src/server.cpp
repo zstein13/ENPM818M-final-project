@@ -1,10 +1,13 @@
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "server.hpp"
 #include "response.hpp"
 #include "code.hpp"
 #include "header.hpp"
+#include "student.hpp"
+#include "file.hpp"
 
 void send_response(int client_sock, Response response)
 {
@@ -42,7 +45,13 @@ void handle_request(int client_sock)
         handle_home(method, client_sock);
     } else if (endpoint == "/about") {
         handle_about(method, client_sock);
-    } else {
+    } else if (endpoint == "/students") {
+        handle_get_all(method, client_sock);
+    } else if (endpoint.find("/student/") != std::string::npos) {
+        std::string email{endpoint.substr(9)};
+        handle_get_student(method, email, client_sock);
+    }
+    else {
         handle_not_found(method, client_sock);
     }
 
@@ -50,7 +59,13 @@ void handle_request(int client_sock)
 
 void handle_home(std::string method, int client_sock) {
     // Create repsonse object
-    Response res{Code::OK, method, "Welcome to the basic HTTP Server!"};
+    Response res;
+    if (method != "GET")
+    {
+        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+    } else {
+        res = {Code::OK, method, "\"Welcome to the basic HTTP Server!\""};
+    }
     
     // Send welcome message
     send_response(client_sock, res);
@@ -59,7 +74,13 @@ void handle_home(std::string method, int client_sock) {
 
 void handle_about(std::string method, int client_sock) {
     // Create repsonse object
-    Response res{Code::OK, method, "This HTTP server is a final project for ENPM818M."};
+    Response res;
+    if (method != "GET")
+    {
+        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+    } else {
+        res = {Code::OK, method, "\"This HTTP server is a final project for ENPM818M.\""};
+    }
 
     send_response(client_sock, res);
 }
@@ -67,14 +88,64 @@ void handle_about(std::string method, int client_sock) {
 void handle_not_found(std::string method, int client_sock)
 {
     // Create repsonse object
-    Response res{Code::NOT_FOUND, method, "Error! Endpoint not found..."};
+    Response res{Code::NOT_FOUND, method, "\"Error! Endpoint not found...\""};
 
     send_response(client_sock, res);
 }
 
-void handle_email(std::string method, int client_sock) {
+void handle_get_all(std::string method, int client_sock) {
+    Response res;
+    
+    if (method != "GET") {
+        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+    } else {   
+        std::vector<Student> students{read_file()};
+        
+        std::stringstream stream;
+        
+        stream << "[";
+        
+        bool first{true};
+        
+        for (Student stud : students)
+        {
+            if (!first) {
+                stream << ",";
+            }
+            first = false;
+            stream << stud.to_json();
+        }
+        
+        stream << "]";
+        
+        res = {Code::OK, method, stream.str()};
+    }
+
+    send_response(client_sock, res);
+}
+
+void handle_get_student(std::string method, std::string email, int client_sock)
+{
     // Create repsonse object
-    Response res{Code::OK, method, "Email endpoint"};
+    Response res;
+    if (method != "GET")
+    {
+        res = {Code::NOT_ALLOWED, method, "\"405 Method Not Allowed...\""};
+    }
+    else
+    {
+        std::vector<Student> students{read_file()};
+        
+        // Create Lambda function to find student based off of email
+        auto it{std::find_if(students.begin(), students.end(), [email] (Student student) { return student.email == email; })};
+
+        if (it != students.end()) {
+            // Found student
+            res = {Code::OK, method, it->to_json()};
+        } else {
+            res = {Code::BAD_REQUEST, method, "\"400 Bad Request...\""};
+        }
+    }
 
     send_response(client_sock, res);
 }
