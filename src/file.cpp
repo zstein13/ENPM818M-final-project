@@ -5,6 +5,7 @@
 
 #include "file.hpp"
 #include "student.hpp"
+#include "code.hpp"
 
 std::vector<Student> read_file()
 {
@@ -66,15 +67,16 @@ std::vector<Student>::iterator find_student(std::vector<Student>& students, std:
     return it;
 }
 
-void update_file(std::vector<Student> students) {
+Code update_file(std::vector<Student> students) {
     // Get the first line from FILE_NAME
+    Code code;
     std::ifstream file_read;
     file_read.open(FILE_NAME);
 
     // Error handling
     if (!file_read.is_open())
     {
-        std::cout << "Error! Could not open file..." << "\n";
+        code = Code::INTERNAL_ERROR;
     }
 
     std::string file_head;
@@ -85,7 +87,7 @@ void update_file(std::vector<Student> students) {
     std::ofstream file_write(FILE_NAME);
     
     if (!file_write.is_open()) {
-        std::cout << "Error! Could not open file..." << "\n";
+        code = Code::INTERNAL_ERROR;
     } else {
         file_write << file_head << "\n";
 
@@ -93,18 +95,25 @@ void update_file(std::vector<Student> students) {
             file_write << static_cast<std::string>(student) << "\n";
         }
         file_write.close();
+        code = Code::OK;
     }
+    
+    return code;
 }
 
-void write_student(Student student) {
+Code write_student(Student student) {
     // Append to the file
     std::ofstream file_write(FILE_NAME, std::ios::app);
+    Code code;
 
     if (!file_write.is_open())
     {
-        std::cout << "Error! Could not open file..." << "\n";
+        code = Code::INTERNAL_ERROR;
+
     } else {
         file_write << static_cast<std::string>(student) << "\n";
         file_write.close();
+        code = Code::OK;
     }
+    return code;
 }

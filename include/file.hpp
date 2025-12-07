@@ -1,5 +1,6 @@
 #include <vector>
 #include "student.hpp"
+#include "code.hpp"
 
 #define FILE_NAME "db.csv"
 #pragma once
@@ -25,11 +26,11 @@ std::vector<Student>::iterator find_student(std::vector<Student>& students, std:
  * 
  * @param students 
  */
-void update_file(std::vector<Student> students);
+Code update_file(std::vector<Student> students);
 
 /**
  * @brief Writes a new student to the file
  * 
  * @param student 
  */
-void write_student(Student student);
+Code write_student(Student student);

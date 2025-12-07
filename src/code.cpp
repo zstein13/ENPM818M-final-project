@@ -14,7 +14,10 @@ std::string get_status_msg(Code code) {
         return "Not Found";
         break;
     case Code::INTERNAL_ERROR:
-        return "Internal Server Error";
+        return "Internal Error";
+        break;
+    case Code::NOT_IMPLEMENTED:
+        return "Not Implemented";
         break;
     default:
         return "Error";
