@@ -22,6 +22,9 @@ std::string get_status_msg(Code code) {
     case Code::NOT_IMPLEMENTED:
         return "\"Not Implemented\"";
         break;
+    case Code::NOT_ALLOWED:
+        return "\"Not Allowed\"";
+        break;
     default:
         return "\"Error\"";
         break;
