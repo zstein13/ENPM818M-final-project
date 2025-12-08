@@ -44,6 +44,8 @@ void send_response(int client_sock, Response response)
 
     std::string server_response{static_cast<std::string>(head) + static_cast<std::string>(response)};
     // Send welcome message
+    std::cout << "Response: " << '\n';
+    std::cout << server_response << '\n';
     write(client_sock, server_response.c_str(), server_response.length());
 
     close(client_sock);
@@ -62,6 +64,7 @@ void handle_request(int client_sock)
     }
 
     std::string buffer_str(buffer, bytes_read);
+    std::cout << "Request: " << '\n';
     std::cout << buffer_str << '\n';
 
     // String parsing variables
@@ -97,7 +100,6 @@ void handle_request(int client_sock)
             while (!user_role.empty() && (user_role.back() == '\r' || user_role.back() == '\n')) {
                 user_role.pop_back();
             }
-            std::cout << "user role: " << user_role << '\n';
         }
         // Process data if content type is application/x-www-form-urlencoded
         if (content_type.substr(0,33) == supported_content_type) {
