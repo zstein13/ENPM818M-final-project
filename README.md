@@ -56,3 +56,8 @@ To build and run the project, follow these steps:
     ```bash
     ./http_server
     ```
+    Make sure the executable is run from the same directory 
+
+## Wireshark .pcap Files
+
+The Wireshark .pcap files are in the wireshark/ directory.
