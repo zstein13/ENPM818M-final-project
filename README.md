@@ -32,3 +32,27 @@ The HTTP Server will be built using C++
 - PUT /student
     - Requires `User-Role: Admin` header
     - Add email, name, and course as data fields
+
+## Building and Running the Project
+
+To build and run the project, follow these steps:
+
+1. Create a build directory and navigate into it:
+    ```bash
+    mkdir build && cd build
+    ```
+
+2. Generate the build files using CMake:
+    ```bash
+    cmake ..
+    ```
+
+3. Build the executable file:
+    ```bash
+    make
+    ```
+
+4. Run the executable file:
+    ```bash
+    ./http_server
+    ```
