@@ -58,6 +58,10 @@ To build and run the project, follow these steps:
     ```
     Make sure the executable is run from the same directory 
 
+## Requests
+
+Use the `curl.sh` file to make requests to the server.
+
 ## Wireshark .pcap Files
 
 The Wireshark .pcap files are in the wireshark/ directory.
