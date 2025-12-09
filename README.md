@@ -64,4 +64,4 @@ Use the `curl.sh` file to make requests to the server.
 
 ## Wireshark .pcap Files
 
-The Wireshark .pcap files are in the wireshark/ directory.
+The Wireshark .pcap files are in the wireshark/ directory. Filter them for HTTP traffic.
